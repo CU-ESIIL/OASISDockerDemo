@@ -3,9 +3,6 @@ name: build-and-push-jupyterlab-image
 on:
   workflow_dispatch:  # This allows you to manually trigger the action from GitHub UI.
 
-env:
-  IMAGE_TAG: "esiil/$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')_jupyterlab:latest"
-
 jobs:
   
   build:
@@ -33,6 +30,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Get lowercase repo name (for dynamic tags)
+        id: repo_name  
+        run: |
+          lowercase_name=$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')
+          echo "::set-output name=repo_name::${lowercase_name}"
         
       - name: Build and push latest
         id: docker_build_jupyterlab
@@ -42,7 +45,8 @@ jobs:
           file: docker/jupyterlab/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: $IMAGE_TAG
+          tags: |
+            esiil/${{ steps.repo_name.outputs.repo_name }}_jupyterlab:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
      
