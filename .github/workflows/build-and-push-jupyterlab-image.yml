@@ -3,6 +3,9 @@ name: build-and-push-jupyterlab-image
 on:
   workflow_dispatch:  # This allows you to manually trigger the action from GitHub UI.
 
+env:
+  IMAGE_TAG: "esiil/$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')_jupyterlab:latest"
+
 jobs:
   
   build:
@@ -39,7 +42,7 @@ jobs:
           file: docker/jupyterlab/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: esiil/$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')_jupyterlab:latest
+          tags: $IMAGE_TAG
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
      
