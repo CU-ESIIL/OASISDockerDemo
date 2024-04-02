@@ -39,7 +39,7 @@ jobs:
           file: docker/jupyterlab/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: esiil/$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')_jupyterlab:latest
+          tags: esiil/$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')_jupyterlab:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
      
