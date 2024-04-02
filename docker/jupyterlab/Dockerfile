@@ -125,7 +125,7 @@ RUN conda update -y conda && \
 WORKDIR /home/jovyan
 COPY environment.yml /home/jovyan/ 
 RUN mamba env create -f /home/jovyan/environment.yml
-RUN . /opt/conda/etc/profile.d/conda.sh && conda deactivate && conda activate demo && python -m ipykernel install --name demo && pip install jupyter_contrib_nbextensions
+RUN . /opt/conda/etc/profile.d/conda.sh && conda deactivate && conda activate custom && python -m ipykernel install --name custom && pip install jupyter_contrib_nbextensions
 
 # Install R packages from CRAN and GitHub
 RUN R -e "remotes::install_github('tomroh/ecoregions')"
