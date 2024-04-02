@@ -30,8 +30,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        
+      - name: Get lowercased repo name
+        run: |
+          lowercase_name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
 
-      - name: Build and push rpb latest
+      - name: Build and push latest
         id: docker_build_jupyterlab
         uses: docker/build-push-action@v4.0.0
         with:
@@ -39,7 +43,7 @@ jobs:
           file: docker/jupyterlab/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: esiil/${{ github.event.repository.name }}_jupyterlab:latest
+          tags: esiil/$lowercase_name_jupyterlab:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
      
