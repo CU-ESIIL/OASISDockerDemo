@@ -20,13 +20,11 @@ jobs:
       run: git fetch --no-tags --no-recurse-submodules https://github.com/CU-ESIIL/Working_group_OASIS.git +refs/heads/*:refs/remotes/template/*
 
     - name: Merge changes from template repository
-      run: git merge --no-commit --no-ff --allow-unrelated-histories template/main
-
-    - name: Continue merge if conflicts exist
       run: |
+        git merge --no-commit --no-ff --allow-unrelated-histories template/main
         git checkout --ours .
         git add .
-
+        
     - name: Commit changes
       run: git commit -am "Merge changes from template repository"
 
