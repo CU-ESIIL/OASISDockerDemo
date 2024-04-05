@@ -6,41 +6,28 @@ on:
 jobs:
   sync_template:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout target repository
-        uses: actions/checkout@v3
-        with:
-          ref: main  # Branch to merge changes into
+    - name: Checkout main repository
+      uses: actions/checkout@v2
 
-      - name: Configure Git for merge
-        run: |
-          git config --global user.name "github-actions" 
-          git config --global user.email "actions@users.noreply.github.com"
+    - name: Fetch template repository
+      run: git fetch --no-tags --no-recurse-submodules https://github.com/CU-ESIIL/Working_group_OASIS.git +refs/heads/*:refs/remotes/template/*
 
-      - name: Add template repository as a remote
-        run: git remote add template https://github.com/CU-ESIIL/Working_group_OASIS
+    - name: Merge changes from template repository
+      run: git merge --no-commit --no-ff --allow-unrelated-histories template/main
 
-      - name: Fetch updates from template
-        run: git fetch template
+    - name: Continue merge if conflicts exist
+      run: |
+        if git diff --name-only --diff-filter=U | grep .; then
+          echo "Conflicts found. Continuing merge process."
+          git merge --continue
+        fi
 
-      - name: Check for merge conflicts (informational)
-        run: git merge template/main --check  # Check for conflicts without merging
+    - name: Commit changes
+      run: git commit -am "Merge changes from template repository"
 
-      - name: Identify new files from template (optional)
-        run: |  # Example using GNU Parallel (if installed)
-          git fetch --depth=1 template/main  # Shallow clone for efficiency
-          git diff --name-only --diff-filter=A template/main | parallel --no-notice echo {} >> new_files.txt
-
-      - name: Merge non-conflicting changes (if no conflicts)
-        run: |  
-          if [[ $(git merge template/main --check 2>&1 | grep 'conflicts') ]]; then
-              echo "Merge conflicts detected! Manual resolution required."
-          else
-              git merge template/main
-          fi
-
-      - name: Push changes to target repository (if merged)
-        uses: actions/checkout@v3  # Use checkout to persist changes 
-        with:
-          token: ${{ secrets.ACCESS_TOKEN }}
-          condition: success()  # Only push if previous step succeeded
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
