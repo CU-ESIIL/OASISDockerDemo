@@ -11,6 +11,11 @@ jobs:
     - name: Checkout main repository
       uses: actions/checkout@v2
 
+    - name: Configure Git for merge
+      run: |
+          git config --global user.name "github-actions" 
+          git config --global user.email "actions@users.noreply.github.com"
+    
     - name: Fetch template repository
       run: git fetch --no-tags --no-recurse-submodules https://github.com/CU-ESIIL/Working_group_OASIS.git +refs/heads/*:refs/remotes/template/*
 
