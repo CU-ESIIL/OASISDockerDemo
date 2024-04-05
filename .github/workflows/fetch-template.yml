@@ -23,10 +23,24 @@ jobs:
       - name: Fetch updates from template
         run: git fetch template
 
-      - name: Merge changes from template
-        run: git merge template/main --allow-unrelated-histories 
+      - name: Check for merge conflicts (informational)
+        run: git merge template/main --check  # Check for conflicts without merging
 
-      - name: Push changes to target repository
-        uses: actions/checkout@v3 # Use checkout to persist changes 
+      - name: Identify new files from template (optional)
+        run: |  # Example using GNU Parallel (if installed)
+          git fetch --depth=1 template/main  # Shallow clone for efficiency
+          git diff --name-only --diff-filter=A template/main | parallel --no-notice echo {} >> new_files.txt
+
+      - name: Merge non-conflicting changes (if no conflicts)
+        run: |  
+          if [[ $(git merge template/main --check 2>&1 | grep 'conflicts') ]]; then
+              echo "Merge conflicts detected! Manual resolution required."
+          else
+              git merge template/main
+          fi
+
+      - name: Push changes to target repository (if merged)
+        uses: actions/checkout@v3  # Use checkout to persist changes 
         with:
-          token: ${{ secrets.ACCESS_TOKEN }} 
+          token: ${{ secrets.ACCESS_TOKEN }}
+          condition: success()  # Only push if previous step succeeded
