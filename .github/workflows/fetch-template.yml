@@ -24,10 +24,8 @@ jobs:
 
     - name: Continue merge if conflicts exist
       run: |
-        if git diff --name-only --diff-filter=U | grep .; then
-          echo "Conflicts found. Continuing merge process."
-          git merge --continue
-        fi
+        git checkout --ours .
+        git add .
 
     - name: Commit changes
       run: git commit -am "Merge changes from template repository"
