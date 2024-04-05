@@ -21,7 +21,7 @@ jobs:
 
     - name: Merge changes from template repository
       run: |
-        git merge --no-commit --no-ff --allow-unrelated-histories template/main
+        git merge --no-commit --no-ff --allow-unrelated-histories template/main || true
         git checkout --ours .
         git add .
         
